@@ -9,8 +9,8 @@ categoria_route = Blueprint('categoria', __name__, url_prefix='/category')
 
 @categoria_route.route('/', methods=['GET'])
 def get_all_categories():
-    result = category_service.get_all_categories()
-    return jsonify(result)
+    categories = category_service.get_all_categories() 
+    return categories, 200
     
 @categoria_route.route('/<int:id>', methods=['GET'])
 def get_category_by_id(id: int):

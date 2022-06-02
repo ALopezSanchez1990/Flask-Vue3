@@ -15,7 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import axios from "axios";
+import { reactive, ref, onMounted } from "vue";
 
 import ModalEditArticle from "@/components/articles/ModalEditArticle.vue";
 import ModalNewArticle from "@/components/articles/ModalNewArticle.vue";
@@ -64,16 +65,20 @@ const actionButtons: BotonAccion[] = [
   }
 ]
 
-const articles: Articulo[] = [
-  { id: 1, titulo: "Articulo 1", cuerpo: "Cuerpo 1", categoria: 1, fechaDePublicacion: new Date(), etiqueta: "etiqueta 1" },
-  { id: 2, titulo: "Articulo 2", cuerpo: "Cuerpo 2", categoria: 2, fechaDePublicacion: new Date(), etiqueta: "etiqueta 2" },
-  { id: 3, titulo: "Articulo 3", cuerpo: "Cuerpo 3", categoria: 3, fechaDePublicacion: new Date(), etiqueta: "etiqueta 3" },
-]
-
+// Data
+const articles = ref<Articulo[]>();
+onMounted(() => {
+  axios.get("http://localhost:5000/articles/").then(
+    (res) => {
+      articles.value = res.data.articles;
+    }
+  )
+})
 const columns: Column[] = [
   { title: "Titulo", key: "titulo", type: "text" },
   { title: "Cuerpo", key: "cuerpo", type: "text" },
-  { title: "categoria", key: "categoria", type: "text" },
+  { title: "Categoria", key: "categoria", type: "text" },
+  { title: "Fecha Publicación", key: "fechaDePublicacion", type: "text"},
   { title: "Acciones", key: "acciones", type: "actions", actions: actionButtons }
 ];
 
