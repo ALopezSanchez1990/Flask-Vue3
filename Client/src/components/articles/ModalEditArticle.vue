@@ -10,41 +10,37 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
+                        <div class="row mb-3">
                             <div class="col">
                                 <label for="formGroupExampleInput" class="form-label">Título</label>
-                                <input type="text" class="form-control" placeholder="First name"
-                                    aria-label="First name" />
+                                <input type="text" class="form-control" placeholder="First name" aria-label="First name"
+                                    v-model="dataR.titulo" />
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mb-3">
                             <div class="col">
                                 <label for="formGroupExampleInput" class="form-label">Cuerpo</label>
                                 <div class="form-floating">
                                     <textarea class="form-control" placeholder="Cuerpo del artículo"
-                                        id="floatingTextarea2" style="height: 100px" />
+                                        id="floatingTextarea2" style="height: 100px"  v-model="dataR.titulo"/>
                                     <label for="floatingTextarea2">Cuerpo del artículo</label>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row mb-3">
                             <div class="col">
                                 <label for="formGroupExampleInput" class="form-label">Categoría</label>
-                                <select class="form-select" aria-label="Default select example">
-                                    <option v-for="category in categories" :value="category.id" :key="'cat_'+ category.id">{{ category.title }}</option>
+                                <select class="form-select" aria-label="Default select example"  v-model="dataR.categoria">
+                                    <option v-for="category in categories" :value="category.id"
+                                        :key="'cat_' + category.id">{{ category.title }}</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col">
-                                <label for="formGroupExampleInput" class="form-label">Fecha Publicación</label>
-                                <input type="text" class="form-control" placeholder="First name"
-                                    aria-label="First name" />
-                            </div>
+                        <div class="row mb-3">
                             <div class="col">
                                 <label for="formGroupExampleInput" class="form-label">Etiqueta</label>
                                 <input type="text" class="form-control" placeholder="First name"
-                                    aria-label="First name" />
+                                    aria-label="First name" v-model="dataR.etiqueta"/>
                             </div>
                         </div>
                     </div>
@@ -59,8 +55,9 @@
 </template>
 
 <script setup lang="ts">
+import axios from "axios";
 import { Modal } from "bootstrap";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, onUpdated, reactive } from "vue";
 
 import type Articulo from "@/helpers/types/articulos/Articulo";
 import type Categoria from "@/helpers/types/categorias/Categoria";
@@ -72,17 +69,12 @@ let thisModalObj: any = null;
 const props = defineProps({
     row: {
         type: Object as () => Articulo,
-        required: false
+        required: true
     },
     confirmEdit: {
         type: Function,
         required: true
     }
-});
-
-// Mount
-onMounted(() => {
-    thisModalObj = new Modal(modalRef.value);
 });
 
 // Show for parent
@@ -99,20 +91,37 @@ const editArticle = () => {
 }
 
 // Data
-const categories: Categoria[]  = [
-  {
-    id: 1,
-    title: "Noticias"
-  },
-  {
-    id: 2,
-    title: "Deportes"
-  },
-  {
-    id: 3,
-    title: "Politica"
-  },
-];
+const categories = ref<Categoria[]>([])
+let formData = ref<Articulo>();
+let titulo = "";
+const dataR = reactive({
+    titulo: ref(""),
+    cuerpo: ref(""),
+    categoria: ref(0),
+    etiqueta: ref(""),
+});
+// Mounted 
+onMounted(() => {
+    thisModalObj = new Modal(modalRef.value);
+    axios.get("http://localhost:5000/category/").then(
+        (res) => {
+            categories.value = res.data.categories
+        }
+    )
+})
+onUpdated(() => {
+    if (props?.row?.id) {
+        const urlGetCategory = `${"http://localhost:5000/articles"}/${props.row.id}`;
+        axios.get(urlGetCategory).then(
+            (res) => {
+                dataR.titulo = res.data.titulo;
+                dataR.cuerpo = res.data.cuerpo;
+                dataR.categoria = res.data.categoria;
+                dataR.etiqueta = res.data.etiqueta;
+            }
+        )
+    }
+});
 </script>
 
 <style>
