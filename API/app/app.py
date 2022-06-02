@@ -9,7 +9,7 @@ app.register_blueprint(article_route)
 app.register_blueprint(categoria_route)
 
 # enable CORS
-CORS(app, resources={r'/*': {'origins': '*'}}, )
+CORS(app, resources={r'/*': {'origins': '*'}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 
 @app.route("/")

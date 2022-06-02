@@ -5,6 +5,6 @@ export default interface Articulo {
     titulo: string, 
     cuerpo: string,
     categoria: Categoria,
-    fechaDePublicacion: Date,
+    fechaDePublicacion?: Date,
     etiqueta: string
 }

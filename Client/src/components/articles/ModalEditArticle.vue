@@ -22,7 +22,7 @@
                                 <label for="formGroupExampleInput" class="form-label">Cuerpo</label>
                                 <div class="form-floating">
                                     <textarea class="form-control" placeholder="Cuerpo del artículo"
-                                        id="floatingTextarea2" style="height: 100px"  v-model="dataR.titulo"/>
+                                        id="floatingTextarea2" style="height: 100px" v-model="dataR.cuerpo" />
                                     <label for="floatingTextarea2">Cuerpo del artículo</label>
                                 </div>
                             </div>
@@ -30,7 +30,8 @@
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="formGroupExampleInput" class="form-label">Categoría</label>
-                                <select class="form-select" aria-label="Default select example"  v-model="dataR.categoria">
+                                <select class="form-select" aria-label="Default select example"
+                                    v-model="dataR.categoria">
                                     <option v-for="category in categories" :value="category.id"
                                         :key="'cat_' + category.id">{{ category.title }}</option>
                                 </select>
@@ -39,8 +40,8 @@
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="formGroupExampleInput" class="form-label">Etiqueta</label>
-                                <input type="text" class="form-control" placeholder="First name"
-                                    aria-label="First name" v-model="dataR.etiqueta"/>
+                                <input type="text" class="form-control" placeholder="First name" aria-label="First name"
+                                    v-model="dataR.etiqueta" />
                             </div>
                         </div>
                     </div>
@@ -65,13 +66,9 @@ import type Categoria from "@/helpers/types/categorias/Categoria";
 let modalRef = ref(null);
 let thisModalObj: any = null;
 
-// Props
+//Props
 const props = defineProps({
-    row: {
-        type: Object as () => Articulo,
-        required: true
-    },
-    confirmEdit: {
+    reloadList: {
         type: Function,
         required: true
     }
@@ -82,24 +79,49 @@ function _show() {
     thisModalObj.show();
 }
 
+function _getData(idArticle: number) {
+    const urlGetArticle = `${"http://localhost:5000/articles"}/${idArticle}`;
+    axios.get(urlGetArticle).then(
+        (res) => {
+            dataR.articleId = res.data.id;
+            dataR.titulo = res.data.titulo;
+            dataR.cuerpo = res.data.cuerpo;
+            dataR.categoria = res.data.categoria;
+            dataR.etiqueta = res.data.etiqueta;
+        }
+    )
+}
+
 // Implicit
-defineExpose({ show: _show });
+defineExpose({ show: _show , getData: _getData});
 
 // Confirm Modal Function
 const editArticle = () => {
-    props.confirmEdit();
+    const urlPutArticle = `${"http://localhost:5000/articles"}/${dataR.articleId}`;
+    const requestToEdit: Articulo = {
+        categoria: dataR.categoria,
+        cuerpo: dataR.cuerpo,
+        etiqueta: dataR.etiqueta,
+        titulo: dataR.titulo
+    }
+    axios.put(urlPutArticle, requestToEdit).then(
+        _ => {
+            thisModalObj.hide();
+            props.reloadList();
+        }
+    );
 }
 
 // Data
 const categories = ref<Categoria[]>([])
-let formData = ref<Articulo>();
-let titulo = "";
 const dataR = reactive({
+    articleId: ref(0),
     titulo: ref(""),
     cuerpo: ref(""),
     categoria: ref(0),
     etiqueta: ref(""),
 });
+
 // Mounted 
 onMounted(() => {
     thisModalObj = new Modal(modalRef.value);
@@ -107,21 +129,9 @@ onMounted(() => {
         (res) => {
             categories.value = res.data.categories
         }
-    )
+    );
 })
-onUpdated(() => {
-    if (props?.row?.id) {
-        const urlGetCategory = `${"http://localhost:5000/articles"}/${props.row.id}`;
-        axios.get(urlGetCategory).then(
-            (res) => {
-                dataR.titulo = res.data.titulo;
-                dataR.cuerpo = res.data.cuerpo;
-                dataR.categoria = res.data.categoria;
-                dataR.etiqueta = res.data.etiqueta;
-            }
-        )
-    }
-});
+
 </script>
 
 <style>

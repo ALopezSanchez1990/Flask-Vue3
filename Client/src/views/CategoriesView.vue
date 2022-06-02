@@ -33,7 +33,7 @@ const columns: Column[] = [
 const categories = ref<Categoria[]>([])
 
 onMounted(() => {
-  axios.get("http://localhost:5000/category").then(
+  axios.get("http://localhost:5000/category/").then(
     (res) => {
       categories.value = res.data.categories
     }
