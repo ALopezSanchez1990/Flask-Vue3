@@ -1,7 +1,9 @@
 from http import HTTPStatus
 from flask import Blueprint, request
 from flask_cors import cross_origin
+from flask_expects_json import expects_json
 import service.articles as article_service
+from schema.articles import articleInputPostSchema
 #from flasgger import swag_from
 #from api.model.welcome import WelcomeModel
 #from api.schema.welcome import WelcomeSchema
@@ -19,6 +21,7 @@ def get_article_by_id(id: int):
     return result, HTTPStatus.OK
 
 @article_route.route('/', methods=['POST', 'OPTIONS'])
+@expects_json(articleInputPostSchema)
 @cross_origin()
 def create_article():
     article = request.get_json()
