@@ -11,7 +11,9 @@
                     <td v-for="(col, indexCol) in props.columns" :key="index + indexCol">
                         <div v-if="col.type == 'text'" class="text-center">{{ row[col.key] }}</div>
                         <div v-if="col.type == 'actions'" class="d-flex justify-content-around">
-                            <button v-for="action in col.actions" class="rounded" :class="action.class" :key="index + action.text + indexCol" @click="action.action(row)">{{action.text}}</button>
+                            <button v-for="action in col.actions" class="rounded" :class="action.class"
+                                :key="index + action.text + indexCol" @click="action.action(row)">{{ action.text
+                                }}</button>
                         </div>
                     </td>
                 </tr>

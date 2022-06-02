@@ -1,6 +1,7 @@
 <template>
     <!-- Modal -->
-    <div class="modal fade" id="modal-new-article" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="modal-new-article" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
+        ref="newArticleModal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -12,8 +13,8 @@
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="formGroupExampleInput" class="form-label">Título</label>
-                                <input type="text" class="form-control" placeholder="First name"
-                                    aria-label="First name" v-model="titulo"/>
+                                <input type="text" class="form-control" placeholder="First name" aria-label="First name"
+                                    v-model="titulo" />
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -21,7 +22,7 @@
                                 <label for="formGroupExampleInput" class="form-label">Cuerpo</label>
                                 <div class="form-floating">
                                     <textarea class="form-control" placeholder="Cuerpo del artículo"
-                                        id="floatingTextarea2" style="height: 100px" v-model="cuerpo"/>
+                                        id="floatingTextarea2" style="height: 100px" v-model="cuerpo" />
                                     <label for="floatingTextarea2">Cuerpo del artículo</label>
                                 </div>
                             </div>
@@ -38,8 +39,8 @@
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="formGroupExampleInput" class="form-label">Etiqueta</label>
-                                <input type="text" class="form-control" placeholder="First name"
-                                    aria-label="First name" v-model="etiqueta" />
+                                <input type="text" class="form-control" placeholder="First name" aria-label="First name"
+                                    v-model="etiqueta" />
                             </div>
                         </div>
                     </div>
@@ -55,22 +56,10 @@
 
 <script setup lang="ts">
 import axios from "axios";
+import { Modal } from "bootstrap";
 import { onMounted, ref } from "vue";
 
-import type Articulo from "@/helpers/types/articulos/Articulo";
 import type Categoria from "@/helpers/types/categorias/Categoria";
-
-// Props
-const props = defineProps({
-    row: {
-        type: Object as () => Articulo,
-        required: true
-    },
-    confirmEdit: {
-        type: Function,
-        required: true
-    }
-});
 
 // Data
 const categories = ref<Categoria[]>([])
@@ -79,17 +68,30 @@ let titulo = ref(null);
 let cuerpo = ref("");
 let etiqueta = ref(null);
 
+let newArticleModal = ref(null);
+let modalObj: any = null;
+
+//Props
+const props = defineProps({
+    reloadList: {
+        type: Function,
+        required: true
+    }
+});
 //Mounted
 onMounted(() => {
-    axios.get("http://localhost:5000/category").then(
+    getCategories();
+    modalObj = new Modal(newArticleModal.value);
+})
+
+//Functions
+const getCategories = () => {
+    axios.get("http://localhost:5000/category/").then(
         (res) => {
             categories.value = res.data.categories
         }
     )
-
-})
-
-//Functions
+}
 const crearArticulo = () => {
     const request = {
         titulo: titulo.value,
@@ -97,7 +99,13 @@ const crearArticulo = () => {
         categoria: categoria.value,
         etiqueta: etiqueta.value
     }
-    axios.post("http://localhost:5000/articles/", request);
+    axios.post("http://localhost:5000/articles/", request)
+        .then(
+            _ => {
+                modalObj.hide();
+                props.reloadList();
+            }
+        );
 }
 </script>
 
