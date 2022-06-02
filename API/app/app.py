@@ -3,10 +3,12 @@ from flask_cors import CORS
 from db.db import create_tables
 from route.articulo import article_route
 from route.categoria import categoria_route
+from middleware.request import CustomMiddleware
 
 app= Flask(__name__)
 app.register_blueprint(article_route)
 app.register_blueprint(categoria_route)
+app.wsgi_app = CustomMiddleware(app.wsgi_app)
 
 # enable CORS
 CORS(app, resources={r'/*': {'origins': '*'}})
