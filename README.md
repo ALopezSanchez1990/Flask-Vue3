@@ -1,5 +1,5 @@
 # Flask API - Vue3 CompositionApi
- Prueba Técnica Puesto FullStack
+ Prueba API con nueva versión de Composition API de Vue
 # Estructura
  División en dos directorios para diferencias la parte cliente y la parte servidor.
  
