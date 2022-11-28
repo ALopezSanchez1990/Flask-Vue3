@@ -1,4 +1,4 @@
-# Plannifai-Test
+# Flask API - Vue3 CompositionApi
  Prueba Técnica Puesto FullStack
 # Estructura
  División en dos directorios para diferencias la parte cliente y la parte servidor.
